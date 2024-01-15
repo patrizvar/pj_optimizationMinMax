@@ -1,12 +1,12 @@
 import numpy as np
 
 from game_utils import BoardPiece, PlayerAction, SavedState, NO_PLAYER
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 
 
 def user_move(board: np.ndarray,
               _player: BoardPiece,
-              saved_state: Optional[SavedState]) -> tuple[PlayerAction, SavedState]:
+              saved_state: Optional[SavedState]) -> Tuple[PlayerAction, SavedState]:
     is_valid_move = False
     while not is_valid_move:
         input_move_string = query_user(input)
