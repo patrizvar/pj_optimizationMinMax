@@ -184,8 +184,7 @@ def assign_scores(window: np.ndarray, player:BoardPiece):
         # count the pieces for each player
         player_count = np.count_nonzero(window == player)
         opp_count = np.count_nonzero(window == opp_player)
-        empty_count = np.count_nonzero(window == NO_PLAYER)
-
+        
         points_for_three = 100
         points_for_two = 50
         points_for_one = 1

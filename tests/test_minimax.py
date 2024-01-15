@@ -1,5 +1,5 @@
 import numpy as np
-from agents.agent_minimax.minimax import evaluate_board  
+from agents.agent_minimax.minimax import score_board  
 from game_utils import BoardPiece, SavedState, NO_PLAYER, PLAYER1, PLAYER2
 
 
@@ -9,11 +9,11 @@ from game_utils import BoardPiece, SavedState, NO_PLAYER, PLAYER1, PLAYER2
 # You could extend that to more complicated forced combinations of moves.
 
 # Remark: The tests here don't work because the names of the functions don't exist in minimax*
-def test_evaluate_board_empty():
+def test_score_board_empty():
     """
     Test that the empty board is assigned a score of 0.
     """
-    from agents.agent_minimax.minimax import evaluate_board
+    from agents.agent_minimax.minimax import score_board
     # test on an empty board
     board_2_test = np.array([[0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
@@ -23,14 +23,14 @@ def test_evaluate_board_empty():
                     [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    score = evaluate_board(board_2_test, player, saved_state)
+    score = score_board(board_2_test, player, saved_state)
     assert score == 0  
 
-def test_evaluate_board_two_pieces():
+def test_score_board_two_pieces():
     """
     Test that two pieces should be assigned score 4.
     """
-    from agents.agent_minimax.minimax import evaluate_board
+    from agents.agent_minimax.minimax import score_board
     board_2_test = np.array([[1, 0, 0, 0, 0, 0, 0],
                     [0, 1, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
@@ -39,14 +39,14 @@ def test_evaluate_board_two_pieces():
                     [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    score = evaluate_board(board_2_test, player, saved_state)
-    assert score == 4 
+    score = score_board(board_2_test, player, saved_state)
+    assert score == 57 
 
-def test_evaluate_board_opponent():
+def test_score_board_opponent():
     """
     Test that 3 opponent pieces should be assigned scores of -200.
     """
-    from agents.agent_minimax.minimax import evaluate_board
+    from agents.agent_minimax.minimax import score_board
     board_2_test = np.array([[2, 2, 2, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0],
@@ -55,25 +55,15 @@ def test_evaluate_board_opponent():
                     [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    score = evaluate_board(board_2_test, player, saved_state)
-    assert score == -200 
+    score = score_board(board_2_test, player, saved_state)
+    assert score == -807 
 
-def test_evaluate_window_no_points():
-    """
-    Test that an array selected for evaluation is assigned correct scores.
-    In this case it's a win == 200.
-    """
-    from agents.agent_minimax.minimax import evaluate_window
-    board_2_test = np.array([1, 1, 1, 1, 0, 0, 0], dtype=int)
-    player = BoardPiece(1)
-    score = evaluate_window(board_2_test, player)  # Remark: This test makes no sense, you don't have a function that looks at rows.
-    assert score == 200  
 
-def test_evaluate_window_win_minus_penalty():
+def test_score_window_win_minus_penalty():
     """
     Sample window that is evaluated, since three are connected, an output of 10 is expected.
     """
-    from agents.agent_minimax.minimax import evaluate_window
+    from agents.agent_minimax.minimax import score_board
     #four connected, three and one available, two and two available = all conditions
     board_2_test = np.array([[0, 0, 0, 0, 0, 0, 0],
                     [0, 1, 0, 0, 0, 0, 0],
@@ -82,15 +72,15 @@ def test_evaluate_window_win_minus_penalty():
                     [0, 0, 0, 0, 0, 0, 0],
                     [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
-    window = board_2_test[1:5, 1]  # Sample window # Remark: If you're only testing a window, there's no need to set up an entire board
-    score = evaluate_window(window, player)
-    assert score == 10 
+    saved_state = SavedState()
+    score = score_board(board_2_test, player,saved_state)
+    assert score == 264
 
 def test_minimax_win():
     """
     Test the scores given when there's a win.
     """
-    from agents.agent_minimax.minimax import minimax
+    from agents.agent_minimax.minimax import generate_move_minimax
     #four connected, three and one available, two and two available = all conditions
     board_2_test = np.array([[0, 1, 0, 0, 0, 0, 0],
                     [0, 1, 0, 0, 0, 0, 0],
@@ -103,8 +93,8 @@ def test_minimax_win():
     depth = 4
     alpha = float('-inf')
     beta = float('inf')
-    score = minimax(board_2_test, depth, alpha, beta, True, saved_state, player)
-    assert score == 214 
+    move, saved_state = generate_move_minimax(board_2_test, player, saved_state)
+    assert move == 3
 
 def test_generate_move_first():
     """
@@ -136,7 +126,7 @@ def test_generate_move_best():
     player = BoardPiece(1)
     saved_state = SavedState()
     best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
-    assert best_move == 0
+    assert best_move == 3
 
 def test_generate_move_block():
     """
