@@ -2,23 +2,7 @@ from typing import Tuple
 import numpy as np
 from game_utils import BoardPiece, PlayerAction, SavedState, NO_PLAYER, PLAYER1, PLAYER2, connected_four
 
-# Remark:
-# Overall, this is a solid submission without major issues. Well done! 
-# Positives:
-# + Overall good tests
-# + Overall good code style and readability
-# + Overall solid documentation
-# + Alpha-beta pruning correctly implemented
-# + Reasonable heuristic
-# Weaknesses:
-# - Mistakes in minimax implementation, poor play as a result
-# - Naming of variables and functions can be better
-# - Tests in test_minimax.py don't work because the names of the functions don't exist in minimax.py
-# - Too many comments
-# - Non-standard docstring format?
-# - Some refactoring steps could be done to make the code more readable
-
-def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> Tuple[PlayerAction, SavedState]:
+def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> Tuple[PlayerAction, SavedState, int]:
     """
     Generate the best move.
 
@@ -33,7 +17,7 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     - Column index with the best move is returned.
 
     Returns:
-    - Tuple[PlayerAction, SavedState]: Best move and game state are returned.
+    - Tuple[PlayerAction, SavedState, int]: Best move, game state, and number of evaluated moves are returned.
     """
     def minimax(board: np.ndarray, depth: int, alpha: float, beta: float, maximizing_player: bool, saved_state: SavedState, player: BoardPiece) -> float:
         """
@@ -80,8 +64,11 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     alpha = float('-inf')
     beta = float('inf')
 
+    evaluated_moves = 0
+
     for col in range(board.shape[1]):
         if 0 in board[:, col]:
+            evaluated_moves += 1
             temp_board = board.copy()
             row = np.where(temp_board[:, col] == 0)[0][-1]
             temp_board[row, col] = player
@@ -100,7 +87,7 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     if equal_moves:
         best_move = np.random.choice(equal_moves)
 
-    return best_move, saved_state
+    return best_move, saved_state, evaluated_moves
 
 def score_board(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> int:
     # Remark: You're evaluating everything from the perspective of the player

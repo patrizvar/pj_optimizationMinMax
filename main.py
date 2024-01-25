@@ -1,9 +1,25 @@
 from typing import Callable
 from game_utils import GenMove
 from agents.agent_human_user import user_move
-from agents.agent_human_user import user_move
 from agents.agent_random import generate_move
 from agents.agent_minimax import generate_minimax
+import pandas as pd
+
+def timed_minimax(board, player, saved_state, args):
+    import time
+
+    start_time = time.time()
+    evaluated_moves = 0
+
+    def generate_move_wrapper(board, player, saved_state, *args):
+        nonlocal evaluated_moves
+        evaluated_moves += 1
+        return generate_minimax(board, player, saved_state, *args)
+
+    while time.time() - start_time < 2:
+        generate_move_wrapper(board.copy(), player, saved_state, *args)
+
+    return evaluated_moves
 
 def human_vs_agent(
     generate_move_1: GenMove,
@@ -20,6 +36,8 @@ def human_vs_agent(
     from game_utils import initialize_game_state, pretty_print_board, apply_player_action, check_end_state, check_move_status
 
     players = (PLAYER1, PLAYER2)
+    evaluated_moves_data = {player_1: []}
+
     for play_first in (1, -1):
         for init, player in zip((init_1, init_2)[::play_first], players):
             init(initialize_game_state(), player)
@@ -40,10 +58,22 @@ def human_vs_agent(
                 print(
                     f'{player_name} you are playing with {PLAYER1_PRINT if player == PLAYER1 else PLAYER2_PRINT}'
                 )
-                action, saved_state[player] = gen_move(
-                    board.copy(),  # copy board to be safe, even though agents shouldn't modify it
-                    player, saved_state[player], *args
-                )
+
+                if gen_move == generate_minimax:
+                    action, saved_state, evaluated_moves = gen_move(
+                        board.copy(),  # copy board to be safe, even though agents shouldn't modify it
+                        player, saved_state, *args
+                    )
+                    evaluated_moves_data[player_name].append(evaluated_moves)
+                    print(f'Moves evaluated in 2 seconds: {evaluated_moves}')
+
+                else:
+                    # Make sure to use the correct variable name here
+                    action, saved_state = gen_move(
+                        board.copy(),  # copy board to be safe, even though agents shouldn't modify it
+                        player, saved_state, *args
+                    )
+
                 print(f'Move time: {time.time() - t0:.3f}s')
 
                 move_status = check_move_status(board, action)
@@ -66,6 +96,10 @@ def human_vs_agent(
                         )
                     playing = False
                     break
+
+    # Save evaluated moves data to Excel
+    df = pd.DataFrame(evaluated_moves_data)
+    df.to_excel('evaluated_moves_data.xlsx', index=False)
 
 if __name__ == "__main__":
     #human_vs_agent(user_move)
