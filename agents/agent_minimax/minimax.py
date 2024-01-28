@@ -161,8 +161,12 @@ def assign_scores(window: np.ndarray, player:BoardPiece):
         # chceck which player is playing
         score = 0
         # Remark: Just setting opp_player = PLAYER1 if player == PLAYER2 else PLAYER2 would be enough, like you did above. No need to set player again.
-        player = PLAYER2 if player == BoardPiece(2) else PLAYER1
-        opp_player = PLAYER1 if player == PLAYER2 else PLAYER2
+        if player == BoardPiece(1):
+            player = PLAYER1
+            opp_player=PLAYER2
+        elif player == BoardPiece(2):
+            player = PLAYER2
+            opp_player=PLAYER1
     
         # count the pieces for each player
         player_count = np.count_nonzero(window == player)
@@ -173,35 +177,19 @@ def assign_scores(window: np.ndarray, player:BoardPiece):
         points_for_one = 1
         # Remark: Why doesn't the opponent get points for 4 or 2? Heuristics are usually symmetric.
 
+        # add the scores based on the patterns detected
+        if player_count == 3:
+            score += points_for_three
+        elif player_count == 2:
+            score += points_for_two
+        elif player_count == 1:
+            score += points_for_one
 
-        # Assign scores from PLAYER2's perspective
-        if player == PLAYER2:
-            if player_count == 3:
-                score += points_for_three
-            elif player_count == 2 and empty_count > 0:
-                score += points_for_two
-            elif player_count == 1 and empty_count > 2:
-                score += points_for_one
+        if opp_count == 3: 
+            score -= points_for_three*6  # penalize opponent's win
+        elif opp_count == 2:
+            score -= points_for_two*4
+        elif opp_count == 1:
+            score -= points_for_one
 
-            # Penalize situations favorable for PLAYER1
-            if opp_count == 3:
-                score -= points_for_three * 4
-            elif opp_count == 2 and empty_count > 0:
-                score -= points_for_two * 2
-
-        # Reverse the logic if PLAYER1 is the player
-        elif player == PLAYER1:
-            if opp_count == 3:
-                score -= points_for_three
-            elif opp_count == 2 and empty_count > 0:
-                score -= points_for_two
-            elif opp_count == 1 and empty_count > 2:
-                score -= points_for_one
-
-            # Reward situations favorable for PLAYER1
-            if player_count == 3:
-                score += points_for_three * 4
-            elif player_count == 2 and empty_count > 0:
-                score += points_for_two * 2
-                
         return score
