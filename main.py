@@ -1,4 +1,5 @@
 from typing import Callable
+from agents.agent_minimax.minimax import save_benchmarking_results
 from game_utils import GenMove
 from agents.agent_human_user import user_move
 from agents.agent_random import generate_move
@@ -105,3 +106,4 @@ if __name__ == "__main__":
     #human_vs_agent(user_move)
     #human_vs_agent(generate_move)
     human_vs_agent(generate_minimax)
+    save_benchmarking_results()

@@ -1,6 +1,8 @@
 from typing import Tuple
 import numpy as np
 from game_utils import BoardPiece, PlayerAction, SavedState, NO_PLAYER, PLAYER1, PLAYER2, connected_four
+import time
+import pandas as pd
 
 def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> Tuple[PlayerAction, SavedState, int]:
     """
@@ -19,6 +21,10 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     Returns:
     - Tuple[PlayerAction, SavedState, int]: Best move, game state, and number of evaluated moves are returned.
     """
+    
+    # time measurement before implementing the function
+    start_time = time.time()     
+    
     def minimax(board: np.ndarray, depth: int, alpha: float, beta: float, maximizing_player: bool, saved_state: SavedState, player: BoardPiece) -> float:
         """
         Applies the minimax algorithm to determine the best move for a player.
@@ -86,8 +92,27 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
 
     if equal_moves:
         best_move = np.random.choice(equal_moves)
+        
+    # compute the best move using the Minimax algorithm
+    move, new_saved_state, score = generate_move_minimax(board, player, saved_state)
+    # measure time after executing a function
+    end_time = time.time() 
+    # run time calculation
+    execution_time = end_time - start_time  
+    # print execution time
+    print(f"Execution time: {execution_time} seconds")  
+    
+    # add measured data to DataFrame
+    global benchmarking_data
+    benchmarking_data = benchmarking_data.append({'Execution Time (s)': execution_time, 'Evaluated Moves': evaluated_moves}, ignore_index=True)
 
     return best_move, saved_state, evaluated_moves
+
+# after program execution is complete, save the measured data as an Excel file.
+def save_benchmarking_results():
+    global benchmarking_data
+    benchmarking_data.to_excel("minimax_benchmarking_results.xlsx", index=False)
+    print("Benchmarking results have been saved.")
 
 def score_board(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> int:
     # Remark: You're evaluating everything from the perspective of the player
