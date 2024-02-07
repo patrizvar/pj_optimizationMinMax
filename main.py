@@ -104,6 +104,6 @@ def human_vs_agent(
 
 if __name__ == "__main__":
     #human_vs_agent(user_move)
-    #human_vs_agent(generate_move)
+    # human_vs_agent(generate_move)
     human_vs_agent(generate_minimax)
     save_benchmarking_results()

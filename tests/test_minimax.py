@@ -153,10 +153,11 @@ def test_generate_move_minimax_accuracy():
     """
     Test that generate_move_minimax returns the correct move for a simple winning condition.
     """
-    # 간단한 승리 조건을 만족하는 게임 상태 설정
+    # setting up a game state that satisfies simple victory conditions
     board = np.zeros((6, 7), dtype=int)
-    board[5, :] = [0, 0, 0, 1, 1, 1, 0]  # 플레이어 1(PLAYER1)이 다음 수로 승리할 수 있는 상태
-    player = BoardPiece(1)  # 플레이어 1
+    # situation where PLAYER1 can win with the following moves:
+    board[5, :] = [0, 0, 0, 1, 1, 1, 0]  
+    player = BoardPiece(1)  
     saved_state = SavedState()
     
     best_move, _, _ = generate_move_minimax(board, player, saved_state)
@@ -166,8 +167,9 @@ def test_generate_move_minimax_evaluated_moves():
     """
     Test that generate_move_minimax evaluates a reasonable number of moves.
     """
-    board = np.zeros((6, 7), dtype=int)  # 초기 게임 보드
-    player = BoardPiece(1)  # 플레이어 1
+    # initial game board
+    board = np.zeros((6, 7), dtype=int)  
+    player = BoardPiece(1)
     saved_state = SavedState()
     
     _, _, evaluated_moves = generate_move_minimax(board, player, saved_state)
@@ -219,11 +221,11 @@ def test_generate_move_minimax(board, player, expected_move):
     assert actual_move == expected_move, f"Expected move {expected_move}, but got {actual_move}"
 
 @pytest.mark.parametrize("board, player, expected_move, expected_accuracy", [
-    # 플레이어 1의 첫 번째 이동으로 중앙 칼럼 선택 예상
+    # player 1 is expected to select the center column as his first move
     (np.zeros((6, 7), dtype=int), PLAYER1, 3, True),
-    # 플레이어 1이 승리 조건에 도달하는 상황
+    # situation where player 1 reaches the victory condition
     (np.array([[0, 0, 0, PLAYER1, PLAYER1, PLAYER1, 0] + [0]*7*5]).reshape((6, 7)), PLAYER1, 3, True),
-    # 플레이어 2가 승리 조건에 가까워진 상황, 플레이어 1이 방어해야 함
+    # player 2 is close to the victory condition, player 1 must defend
     (np.array([[0, 0, 0, PLAYER2, PLAYER2, PLAYER2, 0] + [0]*7*5]).reshape((6, 7)), PLAYER1, 3, True),
 ])
 
@@ -234,7 +236,7 @@ def test_generate_move_minimax_and_benchmark(board, player, expected_move, expec
     execution_time = time.time() - start_time
     accuracy = (actual_move == expected_move) == expected_accuracy
 
-    # 결과 기록
+    # record results
     test_case_name = f"Test_{player}_Expected_{expected_move}_Actual_{actual_move}"
     benchmarking_data.append({
         'Test Case': test_case_name,
