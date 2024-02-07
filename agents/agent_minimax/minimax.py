@@ -1,10 +1,6 @@
 from typing import Tuple
 import numpy as np
 from game_utils import BoardPiece, PlayerAction, SavedState, NO_PLAYER, PLAYER1, PLAYER2, connected_four
-import time
-import pandas as pd
-
-benchmarking_data = pd.DataFrame(columns=['Test Case', 'Execution Time (s)', 'Evaluated Moves'])
 
 def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> Tuple[PlayerAction, SavedState, int]:
     """
@@ -23,10 +19,6 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     Returns:
     - Tuple[PlayerAction, SavedState, int]: Best move, game state, and number of evaluated moves are returned.
     """
-    
-    # time measurement before implementing the function
-    start_time = time.time()     
-    
     def minimax(board: np.ndarray, depth: int, alpha: float, beta: float, maximizing_player: bool, saved_state: SavedState, player: BoardPiece) -> float:
         """
         Applies the minimax algorithm to determine the best move for a player.
@@ -94,49 +86,8 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
 
     if equal_moves:
         best_move = np.random.choice(equal_moves)
-        
-    # compute the best move using the Minimax algorithm
-    # Question: is it actually same as best_move??
-    move, new_saved_state, score = generate_move_minimax(board, player, saved_state)
-    # measure time after executing a function
-    end_time = time.time() 
-    # run time calculation
-    execution_time = end_time - start_time  
-    # print execution time
-    print(f"Execution time: {execution_time} seconds")  
-    
-    # Create test case name (example)
-    test_case_name = f"Test_{player}_{np.random.randint(1000)}"
-    
-    # add measured data to DataFrame
-    record_benchmarking_data(test_case_name, execution_time, evaluated_moves)
 
     return best_move, saved_state, evaluated_moves
-
-def record_benchmarking_data(test_case, execution_time, evaluated_moves):
-    """
-    Records the benchmarking data for each test case.
-
-    Parameters:
-    - test_case: str, the name of the test case.
-    - execution_time: float, the time taken to execute the move.
-    - evaluated_moves: int, the number of moves evaluated during the execution.
-    """
-    global benchmarking_data
-    new_row = {
-        'Test Case': test_case,
-        'Execution Time (s)': execution_time,
-        'Evaluated Moves': evaluated_moves,
-    }
-    benchmarking_data = benchmarking_data.append(new_row, ignore_index=True)
-
-def save_benchmarking_results(file_name="minimax_benchmarking_results.xlsx"):
-    """
-    Saves the benchmarking results to an Excel file.
-    """
-    global benchmarking_data
-    benchmarking_data.to_excel(file_name, index=False)
-    print(f"Benchmarking results have been saved to {file_name}.")
 
 def score_board(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> int:
     # Remark: You're evaluating everything from the perspective of the player
