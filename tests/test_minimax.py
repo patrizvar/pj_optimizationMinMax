@@ -78,41 +78,64 @@ def test_score_window_win_minus_penalty():
     score = score_board(board_2_test, player,saved_state)
     assert score == 264
 
+# test_minimax_win(), test_generate_move_first(), generate_move_minimax(), test_generate_move_block()
+# The function returns three values, but our test code only tried to unpack two of them, 
+# resulting in the error ValueError: too many values to unpack (expected 2).
+
 def test_minimax_win():
     """
     Test the scores given when there's a win.
     """
     from agents.agent_minimax.minimax import generate_move_minimax
-    #four connected, three and one available, two and two available = all conditions
+    # four connected, three and one available, two and two available = all conditions
     board_2_test = np.array([[0, 1, 0, 0, 0, 0, 0],
-                    [0, 1, 0, 0, 0, 0, 0],
-                    [0, 1, 0, 0, 0, 0, 0],
-                    [0, 1, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0]], dtype=int)
+                             [0, 1, 0, 0, 0, 0, 0],
+                             [0, 1, 0, 0, 0, 0, 0],
+                             [0, 1, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
     depth = 4
     alpha = float('-inf')
     beta = float('inf')
-    move, saved_state = generate_move_minimax(board_2_test, player, saved_state)
-    assert move == 3
+    # Assigning function return values to move, saved_state, evaluated_moves variables
+    move, saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    assert move == 3, "Expected the best move to complete a winning line"
 
+# Remark: I'm not sure this test is super useful. But it's ok as a sanity check
 def test_generate_move_first():
     """
     Test whether the move falls within the bounds of the board.
     """
     from agents.agent_minimax.minimax import generate_move_minimax
     board_2_test = np.array([[0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0]], dtype=int)
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
-    assert 0 <= best_move < 7 # Remark: I'm not sure this test is super useful. But it's ok as a sanity check
+    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    assert 0 <= best_move < 7, "The best move should be within the bounds of the board"
+    
+    
+def test_generate_move_block():
+    """
+    Test if the minimax is blocking the opponent.
+    """
+    from agents.agent_minimax.minimax import generate_move_minimax
+    board_2_test = np.array([[2, 2, 2, 0, 0, 0, 1],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0]], dtype=int)
+    player = BoardPiece(1)
+    saved_state = SavedState()
+    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    assert best_move == 3, "Expected best move to block the opponent at column 3"
 
 def test_generate_move_best():
     """
@@ -120,31 +143,16 @@ def test_generate_move_best():
     """
     from agents.agent_minimax.minimax import generate_move_minimax
     board_2_test = np.array([[1, 0, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0],
-                [1, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0]], dtype=int)
+                             [1, 0, 0, 0, 0, 0, 0],
+                             [1, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
-    assert best_move == 3
+    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    assert best_move == 0, "Expected the best move to be at the first column to connect four pieces vertically"
 
-def test_generate_move_block():
-    """
-    Test if the minimax is blocking the opponent.
-    """
-    from agents.agent_minimax.minimax import generate_move_minimax
-    board_2_test = np.array([[2, 2, 2, 0, 0, 0, 1],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0]], dtype=int)
-    player = BoardPiece(1)
-    saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
-    assert best_move == 3
 
 def test_generate_move_minimax_accuracy():
     """
@@ -158,7 +166,7 @@ def test_generate_move_minimax_accuracy():
     saved_state = SavedState()
     
     best_move, _, _ = generate_move_minimax(board, player, saved_state)
-    assert best_move == 3 or best_move == 6, "Expected best move to be 3 or 6 to win"
+    assert best_move == 3 or best_move == 6, f"Expected best move to be 3 or 6 to win, but got {best_move}"
 
 def test_generate_move_minimax_evaluated_moves():
     """
@@ -205,7 +213,7 @@ def initialize_game_state() -> np.ndarray:
 
 
 
-# 특정 열에 동전을 떨어뜨리는 함수 (예시)
+# Function to drop a coin into a specific column
 def apply_player_action(board: np.ndarray, action: int, player: int, copy: bool = True) -> np.ndarray:
     if copy:
         board = board.copy()
@@ -215,31 +223,31 @@ def apply_player_action(board: np.ndarray, action: int, player: int, copy: bool 
             break
     return board
 
-# 성능 측정을 위한 테스트 케이스
+# test cases to measure performance
 def test_generate_minimax_performance():
-    # 게임의 시작, 중반, 종반 상태를 시뮬레이션하는 게임 보드 상태를 준비합니다.
+    # prepare game board states that simulate the beginning, middle, and end states of the game.
     game_states = {
         'start': initialize_game_state(),
         'mid': initialize_game_state(),
         'end': initialize_game_state()
     }
 
-    # 중반 상태 예시: 몇 개의 동전을 무작위로 떨어뜨립니다.
+    # mid-state example: Randomly drop a few coins.
     for _ in range(15):
         col = np.random.randint(0, 7)
         game_states['mid'] = apply_player_action(game_states['mid'], col, np.random.choice([1, 2]))
 
-    # 종반 상태 예시: 더 많은 동전을 떨어뜨려 거의 게임이 끝나게 합니다.
+    # end-state example: Drop more coins, almost ending the game.
     for _ in range(35):
         col = np.random.randint(0, 7)
         game_states['end'] = apply_player_action(game_states['end'], col, np.random.choice([1, 2]))
 
     for state_name, board in game_states.items():
-        player = 1  # 테스트를 위한 플레이어 선택
+        player = 1  # select players for testing
         timer = timeit.Timer(lambda: generate_move_minimax(board, player, None))
         exec_time = timer.timeit(number=10)
         print(f"{state_name} state: {exec_time:.5f} seconds for 10 runs")
 
-# pytest를 사용하여 테스트 실행
+# run tests using pytest
 if __name__ == "__main__":
     test_generate_minimax_performance()
