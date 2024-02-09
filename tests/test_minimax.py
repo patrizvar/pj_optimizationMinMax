@@ -90,10 +90,7 @@ def test_minimax_win():
                     [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    depth = 4
-    alpha = float('-inf')
-    beta = float('inf')
-    move, saved_state = generate_move_minimax(board_2_test, player, saved_state)
+    move, _,_ = generate_move_minimax(board_2_test, player, saved_state) #fixed, failed to run since I changed the function to have more outputs
     assert move == 3
 
 def test_generate_move_first():
@@ -109,7 +106,7 @@ def test_generate_move_first():
                 [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _,_ = generate_move_minimax(board_2_test, player, saved_state)
     assert 0 <= best_move < 7 # Remark: I'm not sure this test is super useful. But it's ok as a sanity check
 
 def test_generate_move_best():
@@ -125,7 +122,7 @@ def test_generate_move_best():
                 [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _,_ = generate_move_minimax(board_2_test, player, saved_state)
     assert best_move == 3
 
 def test_generate_move_block():
@@ -141,7 +138,7 @@ def test_generate_move_block():
                 [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _,_ = generate_move_minimax(board_2_test, player, saved_state)
     assert best_move == 3
 
 
