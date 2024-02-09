@@ -5,6 +5,9 @@ from agents.agent_random import generate_move
 from agents.agent_minimax import generate_minimax
 import pandas as pd
 
+# set to True during development or testing, set to False when deploying.
+DEBUG_MODE = True
+
 def timed_minimax(board, player, saved_state, args):
     import time
 
@@ -35,6 +38,10 @@ def human_vs_agent(
     from game_utils import PLAYER1, PLAYER2, PLAYER1_PRINT, PLAYER2_PRINT, GameState, MoveStatus
     from game_utils import initialize_game_state, pretty_print_board, apply_player_action, check_end_state, check_move_status
 
+    # measure time when in debug mode
+    if DEBUG_MODE:
+        game_start_time = time.time()
+    
     players = (PLAYER1, PLAYER2)
     evaluated_moves_data = {player_1: []}
 
@@ -97,11 +104,14 @@ def human_vs_agent(
                     playing = False
                     break
 
+    if DEBUG_MODE:
+        game_end_time = time.time()
+        print(f"Game completion time: {game_end_time - game_start_time}초")
     # Save evaluated moves data to Excel
     df = pd.DataFrame(evaluated_moves_data)
     df.to_excel('evaluated_moves_data.xlsx', index=False)
 
 if __name__ == "__main__":
     #human_vs_agent(user_move)
-    #human_vs_agent(generate_move)
+    # human_vs_agent(generate_move)
     human_vs_agent(generate_minimax)
