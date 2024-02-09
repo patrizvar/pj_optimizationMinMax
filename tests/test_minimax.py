@@ -121,7 +121,7 @@ def test_generate_move_first():
     saved_state = SavedState()
     best_move, _,_ = generate_move_minimax(board_2_test, player, saved_state)
     assert 0 <= best_move < 7 # Remark: I'm not sure this test is super useful. But it's ok as a sanity check
-    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _, _ = generate_move_minimax(board_2_test, player, saved_state)
     assert 0 <= best_move < 7, "The best move should be within the bounds of the board"
     
     
@@ -138,7 +138,7 @@ def test_generate_move_block():
                              [0, 0, 0, 0, 0, 0, 0]], dtype=int)
     player = BoardPiece(1)
     saved_state = SavedState()
-    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _, _ = generate_move_minimax(board_2_test, player, saved_state)
     assert best_move == 3, "Expected best move to block the opponent at column 3"
 
 def test_generate_move_best():
@@ -156,7 +156,7 @@ def test_generate_move_best():
     saved_state = SavedState()
     best_move, _,_ = generate_move_minimax(board_2_test, player, saved_state)
     assert best_move == 3
-    best_move, new_saved_state, evaluated_moves = generate_move_minimax(board_2_test, player, saved_state)
+    best_move, _, _ = generate_move_minimax(board_2_test, player, saved_state)
     assert best_move == 0, "Expected the best move to be at the first column to connect four pieces vertically"
 
 
