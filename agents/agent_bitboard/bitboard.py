@@ -83,6 +83,18 @@ class Bitboard:
         visualization += "|==============|\n"
         visualization += "|0 1 2 3 4 5 6 |\n"
         return visualization
+    
+    def check_game_end(self):
+        if self.is_win():
+            return GameState.IS_WIN
+        elif self.moves == self.width * self.height:
+            return GameState.IS_DRAW
+        else:
+            return GameState.STILL_PLAYING
+
+    def is_draw(self):
+        # Check if all positions are filled and there is no win
+        return self.moves == self.width * self.height and not self.is_win()
 
 def apply_move(self, col, player):
     if not self.can_play(col):
@@ -92,11 +104,3 @@ def apply_move(self, col, player):
         self.current_position ^= self.mask
     self.mask |= move
     self.moves += 1
-
-def check_game_end(self):
-    if self.is_win():
-        return GameState.IS_WIN
-    elif self.moves == self.width * self.height:
-        return GameState.IS_DRAW
-    else:
-        return GameState.STILL_PLAYING
