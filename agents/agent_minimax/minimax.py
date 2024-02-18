@@ -19,7 +19,7 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     Returns:
     - Tuple[PlayerAction, SavedState, int]: Best move, game state, and number of evaluated moves are returned.
     """
-    def minimax(board: np.ndarray, depth: int, alpha: float, beta: float, maximizing_player: bool, saved_state: SavedState, player: BoardPiece, loop: int) -> float:
+    def minimax(board: np.ndarray, depth: int, alpha: float, beta: float, maximizing_player: bool, saved_state: SavedState, player: BoardPiece) -> float:
         """
         Applies the minimax algorithm to determine the best move for a player.
 
@@ -35,11 +35,8 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
         Returns:
         - float: The best score achieved by the player.
         """
-        
         if connected_four(board, player) or depth == 0:
-            loop += 1
-            return score_board(board, player, saved_state), loop # ignore
-        
+            return score_board(board, player, saved_state)
 
         val = float('-inf') if maximizing_player else float('inf')
         for col in range(board.shape[1]):
@@ -48,7 +45,7 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
                 row = np.where(temp_board[:, col] == 0)[0][-1]
                 temp_board[row, col] = player
 
-                score, loop = minimax(temp_board, depth - 1, alpha, beta, not maximizing_player, saved_state, player, loop)
+                score = minimax(temp_board, depth - 1, alpha, beta, not maximizing_player, saved_state, player)
 
                 if maximizing_player:
                     val = max(val, score)
@@ -60,7 +57,7 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
                 if beta <= alpha:
                     break
 
-        return val, loop
+        return val
 
     best_move = None
     best_score = float('-inf')
@@ -68,7 +65,6 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
     beta = float('inf')
 
     evaluated_moves = 0
-    loop = 0
 
     for col in range(board.shape[1]):
         if 0 in board[:, col]:
@@ -77,21 +73,21 @@ def generate_move_minimax(board: np.ndarray, player: BoardPiece, saved_state: Sa
             row = np.where(temp_board[:, col] == 0)[0][-1]
             temp_board[row, col] = player
 
-            depth = 4
+            depth = 6
             maximizing_player = True
-            score, loop = minimax(temp_board, depth, alpha, beta, maximizing_player, saved_state, player, loop)
+            score = minimax(temp_board, depth, alpha, beta, maximizing_player, saved_state, player)
 
             if score > best_score:
                 best_score = score
                 best_move = col
                 equal_moves = []
             elif score == best_score:
-                equal_moves.append(col)
+                equal_moves.append(col)  # Update equal_moves list
 
     if equal_moves:
         best_move = np.random.choice(equal_moves)
 
-    return best_move, saved_state, loop
+    return best_move, saved_state, evaluated_moves
 
 def score_board(board: np.ndarray, player: BoardPiece, saved_state: SavedState) -> int:
     # Remark: You're evaluating everything from the perspective of the player
@@ -137,9 +133,9 @@ def score_board(board: np.ndarray, player: BoardPiece, saved_state: SavedState) 
             window = [board[row + i][col + i] for i in range(4)]
             player_score += assign_scores(window, player)
     # checking diagonals 2
-    for row in range(3, rows):
+    for row in range(rows - 3):
         for col in range(columns - 3):
-            window = [board[row - i][col + i] for i in range(4)]
+            window = [board[row + 3 - i][col + i] for i in range(4)]
             player_score += assign_scores(window, player)
 
     return player_score
@@ -179,7 +175,7 @@ def assign_scores(window: np.ndarray, player:BoardPiece):
         points_for_three = 100
         points_for_two = 50
         points_for_one = 1
-        # Remark: Why doesn't the opponent get points for 4 or 2? Heuristics are usually symmetric.
+        # Heuristics are usually symmetric.
 
         # add the scores based on the patterns detected
         if player_count == 3:
@@ -192,7 +188,7 @@ def assign_scores(window: np.ndarray, player:BoardPiece):
         if opp_count == 3: 
             score -= points_for_three*6  # penalize opponent's win
         elif opp_count == 2:
-            score -= points_for_two*4
+            score -= points_for_two
         elif opp_count == 1:
             score -= points_for_one
 
